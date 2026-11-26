@@ -24,9 +24,14 @@ const startServer = () => {
     }
 };
 
-const run = () => {
-    startServer();
-    connectToDataBase();
+const run = async () => {
+    try {
+        await connectToDataBase();
+        startServer();
+    } catch (err) {
+        console.error("Failed to start application:", err);
+        process.exit(1);
+    }
 };
 
 run();

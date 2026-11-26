@@ -25,6 +25,7 @@ const schema = new mongoose.Schema({
     },
     password: {
         type: String,
+        select: false,
         required: true
     },
     profilePic: {
@@ -40,23 +41,23 @@ const schema = new mongoose.Schema({
     refresh_token: {
         type: String,
         default: null,
+        select: false,
         required: false
     }
 }, { timestamps: true });
 
 schema.pre("save", async function () {
+    if (!this.isModified("password")) return;
+
     try {
         this.password = await bcrypt.hash(this.password, 10);
-        return;
     } catch (err) {
-        return err;
+        throw err;
     }
 });
 
 schema.set('toJSON', {
     transform: function (doc, ret) {
-        delete ret.password;
-        delete ret.refresh_token;
         delete ret.__v;
         delete ret.createdAt;
         delete ret.updatedAt;
